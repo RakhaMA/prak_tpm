@@ -1,109 +1,59 @@
+
 import 'package:flutter/material.dart';
-import 'package:prak_tpm_3/list_item_page.dart';
-import 'waifu_page.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'biodata_page.dart';
+import 'calendar_page.dart';
+import 'calculate_page.dart';
+
+
+
 
 class HomePage extends StatefulWidget {
-  final String username;
-
-  const HomePage({Key? key, required this.username}) : super(key: key);
-
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedPageIndex = 1;
+
+  List<Widget> _pages = [
+    CalculatePage(),
+    CalendarPage(),
+    BiodataPage(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Halaman Utama'),
+        title: const Center(child: Text('UTS Mobile')),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            _showUsername(),
-            SizedBox(height: 20),
-            _buildMenu(),
-          ],
-        ),
+      body: SafeArea(child: _pages[_selectedPageIndex]),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _selectedPageIndex,
+        backgroundColor: Colors.white24,
+        color: Colors.grey,
+        items: const <Widget>[
+          Icon(Icons.clear_all_outlined, color: Colors.white,),
+          Icon(Icons.access_time_outlined, color: Colors.white,),
+          Icon(Icons.account_circle_outlined, color: Colors.white,),
+          Icon(Icons.logout_outlined, color: Colors.white,),
+
+        ],
+        onTap: (int index) {
+          if (index == 3) {
+            Logout();
+          }else{
+            setState(() {
+              _selectedPageIndex = index;
+            });
+          }
+        },
       ),
     );
   }
 
-  Widget _showUsername() {
-    return Container(
-      alignment: Alignment.center,
-      child: Text(
-        'Welcome ${widget.username}',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenu() {
-    return Column(
-      children: [
-        _buildMenuItem(
-          'Groceries List',
-          'Go to Groceries List Page',
-              () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => GroceriesList()),
-          ),
-        ),
-        _buildMenuItem(
-          'My Waifu',
-          'My Waifu Images',
-              () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => WaifuPage()),
-          ),
-        ),
-        // _buildMenuItem(
-        //   'Menu Item 3',
-        //   'This is menu item 3',
-        //       () => {},
-        // ),
-      ],
-    );
-  }
-
-  Widget _buildMenuItem(String title, String subtitle, Function onPressed) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Card(
-        elevation: 4,
-        child: InkWell(
-          onTap: () => onPressed(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  void Logout() {
+    Navigator.pushReplacementNamed(context, '/logout');
   }
 }

@@ -99,14 +99,14 @@ class _LoginPageState extends State<LoginPage> {
 
         onPressed: () async {
           String text = "";
-          if(password == "rakha123"){
+          if(password == "a"){
             setState(() {
               text = "Login Success";
               isLoginSuccess = true;
             });
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(username: username)),
+              MaterialPageRoute(builder: (context) => HomePage()),
             );
 
             final player = AudioPlayer();
