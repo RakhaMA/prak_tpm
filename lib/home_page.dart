@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:prak_tpm_3/list_item_page.dart';
-import 'waifu_page.dart';
+import 'listproduct.dart';
+
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -52,15 +52,7 @@ class _HomePageState extends State<HomePage> {
           'Go to Groceries List Page',
               () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => GroceriesList()),
-          ),
-        ),
-        _buildMenuItem(
-          'My Waifu',
-          'My Waifu Images',
-              () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => WaifuPage()),
+            MaterialPageRoute(builder: (context) => ListProduct()),
           ),
         ),
         // _buildMenuItem(
