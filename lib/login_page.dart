@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
             });
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(username: username)),
+              MaterialPageRoute(builder: (context) => HomePage()),
             );
 
             final player = AudioPlayer();

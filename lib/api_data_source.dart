@@ -1,14 +1,27 @@
-import 'base_network.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'model.dart';
 
-final BaseNetwork _baseNetwork = BaseNetwork();
-
 class ApiDataSource {
-  Future<List<Product>> getProducts() async {
-    final jsonResponse = await _baseNetwork.get('');
+  final String _baseUrl = 'https://api.genshin.dev/characters';
 
-    final List<dynamic> data = jsonResponse;
+  Future<List<String>> getCharacters() async {
+    var response = await http.get(Uri.parse(_baseUrl));
+    if (response.statusCode == 200) {
+      return List<String>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load characters');
+    }
+  }
 
-    return data.map((json) => Product.fromJson(json)).toList();
+  Future<Character> getCharacter(String name) async {
+    var response = await http.get(Uri.parse('$_baseUrl/$name'));
+    if (response.statusCode == 200) {
+      return Character.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load character');
+    }
   }
 }
+

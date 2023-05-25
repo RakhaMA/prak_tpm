@@ -1,74 +1,43 @@
-import 'package:flutter/material.dart';
-import 'api_data_source.dart';
-import 'detailproduct.dart';
-import 'model.dart';
-
-class ListProduct extends StatelessWidget {
-  final ApiDataSource _dataSource = ApiDataSource();
-
-  ListProduct({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Products'),
-        ),
-        body: Container(
-          padding: EdgeInsets.all(10),
-          child: FutureBuilder<List<Product>>(
-            future: _dataSource.getProducts(),
-            builder: (context, dataProducts) {
-              if (dataProducts.hasData) {
-                return ListView.builder(
-                  itemCount: dataProducts.data!.length,
-                  itemBuilder: (context, index) {
-                    final product = dataProducts.data![index];
-
-                    return InkWell(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailProduct(product: product),
-                          ),
-                        );
-
-                      },
-                      splashColor: Colors.grey.withOpacity(0.2),
-                      highlightColor: Colors.grey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      child: ListTile(
-                        leading: Image.network(
-                          product.image,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        ),
-                        title: Text(product.title),
-                        subtitle: Text('\$${product.price}'),
-                        trailing: Column(
-                          children: [
-                            Icon(
-                                Icons.add_shopping_cart
-                            ),
-                            Text(product.rating['count'].toString())
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              } else if (dataProducts.hasError) {
-                return Text('${dataProducts.error}');
-              }
-
-              return const Center(child: CircularProgressIndicator());
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
+// import 'package:flutter/material.dart';
+// import 'base_network.dart';
+// import 'model.dart';
+//
+// class CharactersList extends StatelessWidget {
+//   final BaseNetwork baseNetwork = BaseNetwork();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Characters'),
+//       ),
+//       body: FutureBuilder<List<Character>>(
+//         future: _fetchCharacters(),
+//         builder: (context, snapshot) {
+//           if (snapshot.hasData) {
+//             final characters = snapshot.data!;
+//             return ListView.builder(
+//               itemCount: characters.length,
+//               itemBuilder: (context, index) {
+//                 final character = characters[index];
+//                 return ListTile(
+//                   title: Text(character.name),
+//                   subtitle: Text(character.vision),
+//                 );
+//               },
+//             );
+//           } else if (snapshot.hasError) {
+//             return Center(child: Text('Failed to load data'));
+//           }
+//           return Center(child: CircularProgressIndicator());
+//         },
+//       ),
+//     );
+//   }
+//
+//   Future<List<Character>> _fetchCharacters() async {
+//     final response = await baseNetwork.get('characters');
+//     final List<dynamic> charactersJson = response;
+//     return charactersJson.map((json) => Character.fromJson(json)).toList();
+//   }
+// }
