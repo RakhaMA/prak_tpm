@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ApiDataSource _apiDataSource = ApiDataSource();
-  List<String> _characters = [];
+  Map<String, List<String>> _charactersByVision = {};
 
   @override
   void initState() {
@@ -22,20 +22,30 @@ class _HomePageState extends State<HomePage> {
 
   void _getCharacters() async {
     var characters = await _apiDataSource.getCharacters();
-    setState(() {
-      _characters = characters;
-    });
+
+    // Categorize characters by their Vision
+    for (var character in characters) {
+      String vision = await _apiDataSource.getCharacterVision(character);
+      if (_charactersByVision.containsKey(vision)) {
+        _charactersByVision[vision]?.add(character);
+      } else {
+        _charactersByVision[vision] = [character];
+      }
+    }
+
+    setState(() {});
   }
 
   void _showCharacterDetails(String name) async {
     var character = await _apiDataSource.getCharacter(name);
-    String imgUrl = "https://api.genshin.dev/characters/${name}/card";
-    print(character);
-    print(imgUrl);
+    String imgUrl = "https://api.genshin.dev/characters/$name/card";
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailCharacter(character: character, imgUrl: imgUrl,),
+        builder: (context) => DetailCharacter(
+          character: character,
+          imgUrl: imgUrl,
+        ),
       ),
     );
   }
@@ -47,14 +57,21 @@ class _HomePageState extends State<HomePage> {
         title: Text('Genshin Characters'),
       ),
       body: ListView.builder(
-        itemCount: _characters.length,
+        itemCount: _charactersByVision.keys.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_characters[index]),
-            onTap: (){
-              print(_characters[index]);
-              _showCharacterDetails(_characters[index]);
-            }
+          String vision = _charactersByVision.keys.elementAt(index);
+          List<String> characters = _charactersByVision[vision] ?? [];
+
+          return ExpansionTile(
+            title: Text(vision),
+            children: characters
+                .map(
+                  (character) => ListTile(
+                title: Text(character),
+                onTap: () => _showCharacterDetails(character),
+              ),
+            )
+                .toList(),
           );
         },
       ),

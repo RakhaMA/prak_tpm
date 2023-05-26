@@ -23,5 +23,15 @@ class ApiDataSource {
       throw Exception('Failed to load character');
     }
   }
+
+  Future<String> getCharacterVision(String name) async {
+    var response = await http.get(Uri.parse('$_baseUrl/$name'));
+    if (response.statusCode == 200) {
+      var characterData = json.decode(response.body);
+      return characterData['vision'];
+    } else {
+      throw Exception('Failed to load character vision');
+    }
+  }
 }
 

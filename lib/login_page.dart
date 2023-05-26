@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:prak_tpm_3/home_screen.dart';
 import 'home_page.dart';
-import 'listproduct.dart';
 
 
 class LoginPage extends StatefulWidget{
@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
             });
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => HomeScreen()),
             );
 
             final player = AudioPlayer();

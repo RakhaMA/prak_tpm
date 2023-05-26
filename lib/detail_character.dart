@@ -19,17 +19,90 @@ class DetailCharacter extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Vision: ${character.vision}'),
-            Text('Weapon: ${character.weapon}'),
-            Text('Nation: ${character.nation}'),
-            Text('Affiliation: ${character.affiliation}'),
-            Text('Rarity: ${character.rarity}'),
-            Text('Constellation: ${character.constellation}'),
-            Image.network(imgUrl),
+            SizedBox(height: 16.0),
+            Center(
+              child: Image.network(
+                imgUrl,
+                height: 200.0,
+                width: 200.0,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              'Vision:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.vision,
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Weapon:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.weapon,
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Nation:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.nation,
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Affiliation:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.affiliation,
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Rarity:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.rarity.toString(),
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Constellation:',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              character.constellation,
+              style: TextStyle(fontSize: 16.0),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
