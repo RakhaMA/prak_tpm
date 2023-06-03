@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:prak_tpm_3/home_screen.dart';
 import 'home_page.dart';
 
-
-class LoginPage extends StatefulWidget{
-
+class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
 
   @override
@@ -13,29 +12,39 @@ class LoginPage extends StatefulWidget{
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late SharedPreferences _prefs;
   String username = "";
   String password = "";
   bool isLoginSuccess = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _initSharedPreferences();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("Login Page"),
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                _showImage(),
-                _usernameField(),
-                _passwordField(),
-                _loginButton(context),
-              ],
-            ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Login Page"),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _showImage(),
+              _usernameField(),
+              _passwordField(),
+              _loginButton(context),
+            ],
           ),
         ),
+      ),
     );
   }
 
@@ -44,8 +53,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: TextFormField(
         enabled: true,
-        onChanged: (value){
-          username = value;
+        onChanged: (value) {
+          setState(() {
+            username = value;
+          });
         },
         decoration: InputDecoration(
           hintText: 'Username',
@@ -56,8 +67,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(color: (isLoginSuccess) ? Colors.deepPurple : Colors.red),
-          )
+            borderSide: BorderSide(
+                color: (isLoginSuccess) ? Colors.deepPurple : Colors.red),
+          ),
         ),
       ),
     );
@@ -68,8 +80,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: TextFormField(
         enabled: true,
-        onChanged: (value){
-          password = value;
+        onChanged: (value) {
+          setState(() {
+            password = value;
+          });
         },
         obscureText: true,
         decoration: InputDecoration(
@@ -81,10 +95,40 @@ class _LoginPageState extends State<LoginPage> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(color: (isLoginSuccess) ? Colors.deepPurple : Colors.red),
-          )
+            borderSide: BorderSide(
+                color: (isLoginSuccess) ? Colors.deepPurple : Colors.red),
+          ),
         ),
       ),
+    );
+  }
+
+  Future<void> _login(BuildContext context) async {
+    String text = "";
+    if (password == "rakha123") {
+      setState(() {
+        text = "Login Success";
+        isLoginSuccess = true;
+      });
+      await _prefs.setBool('isLoggedIn', true); // Store login status
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+
+      final player = AudioPlayer();
+      await player.play(AssetSource('zeta1.mp3'));
+    } else {
+      setState(() {
+        text = "Login Failed";
+        isLoginSuccess = false;
+      });
+      final player = AudioPlayer();
+      await player.play(AssetSource('zetaa.mpeg'));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text)),
     );
   }
 
@@ -97,36 +141,7 @@ class _LoginPageState extends State<LoginPage> {
           primary: (isLoginSuccess) ? Colors.grey : Colors.red,
           onPrimary: Colors.white,
         ),
-
-        onPressed: () async {
-          String text = "";
-          if(password == "rakha123"){
-            setState(() {
-              text = "Login Success";
-              isLoginSuccess = true;
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-            );
-
-            final player = AudioPlayer();
-            await player.play(AssetSource('zeta1.mp3'));
-          }else{
-            setState(() {
-              text = "Login Failed";
-              isLoginSuccess = false;
-            });
-            final player = AudioPlayer();
-            await player.play(AssetSource('zetaa.mpeg'));
-          }
-
-          SnackBar snackBar = SnackBar(
-              content: Text(text)
-          );
-
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        },
+        onPressed: () => _login(context),
         child: const Text('Login'),
       ),
     );
@@ -136,8 +151,13 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 30),
       child: ClipOval(
-          child: Image.asset('zeta.jpg', height: 250, width: 250, fit: BoxFit.cover,)
-      )
+        child: Image.asset(
+          'zeta.jpg',
+          height: 250,
+          width: 250,
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 }

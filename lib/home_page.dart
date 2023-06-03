@@ -1,146 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-
 import 'api_data_source.dart';
-import 'detail_character.dart';
-import 'favorite.dart';
+import 'database.dart';
+import 'model.dart';
+import 'detail_page.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage() : super();
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  ApiDataSource _apiDataSource = ApiDataSource();
-  Map<String, List<String>> _charactersByVision = {};
-
-  int _currentIndex = 0;
-  final PageController _pageController = PageController();
+  final ApiDataSource apiDataSource = ApiDataSource();
+  final DatabaseHelper databaseHelper = DatabaseHelper.instance;
+  List<Movie> movies = [];
+  late TextEditingController searchController;
 
   @override
   void initState() {
     super.initState();
-    _getCharacters();
+    searchController = TextEditingController();
   }
 
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+  Future<void> fetchMovies(String searchQuery) async {
+    try {
+      final List<Movie> fetchedMovies = await apiDataSource.fetchMovies(searchQuery);
+      setState(() {
+        movies = fetchedMovies;
+      });
+    } catch (e) {
+      print('Failed to fetch movies: $e');
+    }
   }
 
-  void _onNavItemTapped(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _getCharacters() async {
-    var characters = await _apiDataSource.getCharacters();
-
-    // Categorize characters by their Vision
-    for (var character in characters) {
-      String vision = await _apiDataSource.getCharacterVision(character);
-      if (_charactersByVision.containsKey(vision)) {
-        _charactersByVision[vision]?.add(character);
+  Future<void> addToFavorite(Movie movie) async {
+    try {
+      final int id = await databaseHelper.addToFavorite(movie);
+      if (id > 0) {
+        print('Added to favorites');
       } else {
-        _charactersByVision[vision] = [character];
+        print('Failed to add to favorites');
       }
+    } catch (e) {
+      print('Failed to add to favorites: $e');
     }
-
-    setState(() {});
-  }
-
-  void _showCharacterDetails(String name) async {
-    var character = await _apiDataSource.getCharacter(name);
-    String imgUrl = "https://api.genshin.dev/characters/$name/card";
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DetailCharacter(
-          character: character,
-          imgUrl: imgUrl,
-        ),
-      ),
-    );
-  }
-
-  void _toggleFavorite(String character) async {
-    bool isFavorite = await FavoriteManager.isFavorite(character);
-    if (isFavorite) {
-      await FavoriteManager.removeFromFavorites(character);
-    } else {
-      await FavoriteManager.addToFavorites(character);
-    }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Genshin Characters'),
+        title: Text('Movie Search'),
       ),
-      body: ListView.builder(
-        itemCount: _charactersByVision.keys.length,
-        itemBuilder: (context, index) {
-          String vision = _charactersByVision.keys.elementAt(index);
-          List<String> characters = _charactersByVision[vision] ?? [];
-
-          // Get the vision logo asset path
-          String visionLogoAsset = 'assets/images/visions/${vision.toLowerCase()}.png';
-
-          return ExpansionTile(
-            title: Row(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
               children: [
-                Image.asset(
-                  visionLogoAsset,
-                  height: 24.0,
-                  width: 24.0,
-                ),
-                SizedBox(width: 8.0),
-                Text(vision),
-              ],
-            ),
-            children: characters
-                .map(
-                  (character) => ListTile(
-                title: Text(character),
-                trailing: IconButton(
-                  onPressed: () => _toggleFavorite(character),
-                  icon: FutureBuilder<bool>(
-                    future: FavoriteManager.isFavorite(character),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        bool isFavorite = snapshot.data!;
-                        return Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : null,
-                        );
-                      } else {
-                        return Icon(Icons.favorite_border);
-                      }
-                    },
+                Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter a movie title',
+                    ),
                   ),
                 ),
-                onTap: () => _showCharacterDetails(character),
-              ),
-            )
-                .toList(),
-          );
-        },
-      ),
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.blue,
-        items: <Widget>[
-          Icon(Icons.home, size: 30),
-          Icon(Icons.favorite, size: 30),
+                SizedBox(width: 8.0),
+                ElevatedButton(
+                  onPressed: () {
+                    final String searchQuery = searchController.text.trim();
+                    if (searchQuery.isNotEmpty) {
+                      fetchMovies(searchQuery);
+                    }
+                  },
+                  child: Text('Search'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                final Movie movie = movies[index];
+                return ListTile(
+                  title: Text(movie.title),
+                  subtitle: Text(movie.year),
+                  trailing: IconButton(
+                    icon: Icon(Icons.favorite),
+                    onPressed: () {
+                      addToFavorite(movie);
+                    },
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(movie: movie),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
         ],
-        onTap: _onNavItemTapped,
       ),
     );
   }

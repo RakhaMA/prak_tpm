@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/background/genshin-impact-07.jpg',),
+                image: AssetImage('assets/zeta.jpg',),
                 fit: BoxFit.cover,
               )
           ),

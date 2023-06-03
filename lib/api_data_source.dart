@@ -1,37 +1,36 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'model.dart';
 
 class ApiDataSource {
-  final String _baseUrl = 'https://api.genshin.dev/characters';
+  static const String apiKey = 'cdce484f';
 
-  Future<List<String>> getCharacters() async {
-    var response = await http.get(Uri.parse(_baseUrl));
+  Future<List<Movie>> fetchMovies(String searchQuery) async {
+    final response = await http.get(
+      Uri.parse('http://www.omdbapi.com/?apikey=$apiKey&s=$searchQuery'),
+    );
+
     if (response.statusCode == 200) {
-      return List<String>.from(json.decode(response.body));
+      final jsonData = jsonDecode(response.body);
+      final List<dynamic> moviesData = jsonData['Search'];
+      final List<Movie> movies = [];
+
+      for (var movieData in moviesData) {
+        final String imdbId = movieData['imdbID'];
+        final detailsResponse = await http.get(
+          Uri.parse('http://www.omdbapi.com/?apikey=$apiKey&i=$imdbId'),
+        );
+
+        if (detailsResponse.statusCode == 200) {
+          final detailsJsonData = jsonDecode(detailsResponse.body);
+          movies.add(Movie.fromJson(imdbId, detailsJsonData));
+        }
+      }
+
+      return movies;
     } else {
-      throw Exception('Failed to load characters');
+      throw Exception('Failed to fetch movies');
     }
   }
 
-  Future<Character> getCharacter(String name) async {
-    var response = await http.get(Uri.parse('$_baseUrl/$name'));
-    if (response.statusCode == 200) {
-      return Character.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to load character');
-    }
-  }
-
-  Future<String> getCharacterVision(String name) async {
-    var response = await http.get(Uri.parse('$_baseUrl/$name'));
-    if (response.statusCode == 200) {
-      var characterData = json.decode(response.body);
-      return characterData['vision'];
-    } else {
-      throw Exception('Failed to load character vision');
-    }
-  }
 }
-

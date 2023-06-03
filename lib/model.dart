@@ -1,31 +1,61 @@
-class Character {
-  final String name;
-  final String vision;
-  final String weapon;
-  final String nation;
-  final String affiliation;
-  final String rarity;
-  final String constellation;
+class Movie {
+  final String imdbId;
+  final String title;
+  final String year;
+  final String plot;
+  final String posterUrl;
+  final String genre;
 
-  Character({
-    required this.name,
-    required this.vision,
-    required this.weapon,
-    required this.nation,
-    required this.affiliation,
-    required this.rarity,
-    required this.constellation,
+  Movie({
+    required this.imdbId,
+    required this.title,
+    required this.year,
+    required this.plot,
+    required this.posterUrl,
+    required this.genre,
   });
 
-  factory Character.fromJson(Map<String, dynamic> json) {
-    return Character(
-      name: json['name'],
-      vision: json['vision'],
-      weapon: json['weapon'],
-      nation: json['nation'],
-      affiliation: json['affiliation'],
-      rarity: json['rarity'].toString(),
-      constellation: json['constellation'],
+  factory Movie.fromJson(String imdbId, Map<String, dynamic> json) {
+    return Movie(
+      imdbId: imdbId,
+      title: json['Title'] ?? '',
+      year: json['Year'] ?? '',
+      plot: json['Plot'] ?? '',
+      posterUrl: json['Poster'] ?? '',
+      genre: json['Genre'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'imdbID': imdbId,
+      'Title': title,
+      'Year': year,
+      'Plot': plot,
+      'Poster': posterUrl,
+      'Genre': genre,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'imdbId': imdbId,
+      'title': title,
+      'year': year,
+      'plot': plot,
+      'posterUrl': posterUrl,
+      'genre': genre,
+    };
+  }
+
+  factory Movie.fromMap(Map<String, dynamic> map) {
+    return Movie(
+      imdbId: map['imdbId'],
+      title: map['title'],
+      year: map['year'],
+      plot: map['plot'],
+      posterUrl: map['posterUrl'],
+      genre: map['genre'],
     );
   }
 }
